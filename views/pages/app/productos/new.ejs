@@ -1,0 +1,31 @@
+<%- include('../../../partials/header'); %>
+<!-- * Ingeniria de Software
+* 04/04/2021
+* 
+* Arturo Ortega Robles
+* Diego Antonio Paredes -->
+
+  <h2>Nuevo Producto</h2>
+  <div class="table-responsive">
+    <form method="post" action="/app/productos/nuevo">
+      <div class="mb-3">
+        <label for="tituloProducto" class="form-label">Titulo</label>
+        <input name="titulo" type="text" class="form-control" id="tituloProducto" aria-describedby="emailHelp" required>
+        <div id="emailHelp" class="form-text">No necesita ser único.</div>
+      </div>
+      <div class="mb-3">
+        <label for="precioProducto" class="form-label">Precio</label>
+        <input name="precio" type="number" class="form-control" id="precioProducto" required>
+      </div>
+      <div class="mb-3">
+        <label for="descripcionProducto" class="form-label">Descripción</label>
+        <textarea name="descripcion" type="text" class="form-control" id="descripcionProducto" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script>
+
+<%- include('../../../partials/footer'); %>
