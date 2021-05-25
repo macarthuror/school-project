@@ -8,6 +8,7 @@
 
   <h2>Productos</h2>
   <a href="productos/nuevo" class="btn btn-primary">Nuevo Producto</a>
+  <a href="productos?deleted=true" class="btn btn-warning">Mostrar Eliminados</a>
   <div class="table-responsive">
     <table class="table table-striped table-sm">
       <thead>
@@ -21,16 +22,26 @@
           <th>Acciones</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody x-data="productsData()">
         <% for(const producto of productos){  %>
           <tr>
             <td><%= producto.id %></td>
             <td><%= producto.titulo %></td>
             <td><%= producto.descripcion %></td>
-            <td><%= producto.precio %></td>
-            <td><%= producto.status ? 'Activo' : 'No activo' %></td>
-            <td><%= new Date(producto.reg_date).toISOString() %></td>
-            <td>eliminar</td>
+            <td>$<%= producto.precio %></td>
+            <td>
+              <% if (!producto.status) { %>
+                <span class="badge bg-danger">Eliminado</span>
+              <% } else { %>
+                <span class="badge bg-primary">Activo</span>
+              <% } %>
+            </td>
+            <td><%= new Date(producto.reg_date).toISOString().substring(0,10) %></td>
+            <% if (!producto.status) { %>
+              <td class="btn btn-outline-success" @click="deleteItem(<%= producto.id %>, <%= !producto.status %>)">reactivar</td>
+            <% } else { %>
+              <td class="btn btn-outline-danger" @click="deleteItem(<%= producto.id %>, <%= !producto.status %>)">eliminar</td>
+            <% } %>
           </tr>
         <% } %>
       </tbody>
@@ -43,6 +54,21 @@
   </div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script>
+  function productsData() {
+      return {
+        async deleteItem(id, reactive) {
+          if (!id) return
+          try {
+            await axios.delete(`/app/productos/${id}${reactive ? '?reactive=true' : ''}`)
+            location.reload()
+          } catch (error) {
+            alert('Error al eliminar')
+          }
+        }
+      }
+    }
+</script>
 
 <%- include('../../partials/footer'); %>

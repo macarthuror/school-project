@@ -1,19 +1,26 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"
+  integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE"
+  crossorigin="anonymous" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js"
+  integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc"
+  crossorigin="anonymous" async></script>
 
   <script>
     function search() {
       return {
         searchBar: '',
+        deletedItems: null,
         find() {
-          window.location = this.searchBar ? `/app/productos?like=${this.searchBar}` : '/app/productos'
+          window.location = this.searchBar ? `/app/productos?like=${this.searchBar}${deleted ? '&deleted=true' : ''}` : '/app/productos'
         },
         init() {
           const queryString = window.location.search;
           const urlParams = new URLSearchParams(queryString);
           this.searchBar = urlParams.get('like');
+          this.deletedItems = urlParams.get('deleted');
         }
       }
     }

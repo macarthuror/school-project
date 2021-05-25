@@ -8,8 +8,10 @@
 'use strict';
 
 const express = require('express');
-const flash = require('connect-flash');
+const flash   = require('connect-flash');
 const session = require('express-session');
+const compression = require('compression');
+
 const { secretKey } = require('./config');
 
 const app = express();
@@ -25,6 +27,7 @@ app.use(session({
 	saveUninitialized: true,
     cookie: { maxAge: 7200000 },
 }));
+app.use(compression());
 app.use(function (req, res, next) {
     res.locals.error = req.flash("error");
     res.locals.myPath = req.path;
@@ -53,7 +56,10 @@ app.use(function (req, res, next) {
     next();
 });
 app.use(function (req, res, next) {
-    if (req.method === 'GET' && req.path === '/' && req.session.loggedin){
+    if (req.method === 'GET'
+        && req.path === '/'
+        && req.session.loggedin
+    ){
         res.redirect('/app');
     } else {
         next();
@@ -61,7 +67,7 @@ app.use(function (req, res, next) {
 });
 
 app.set('view engine', 'ejs');
-app.use('/static', express.static('public'));
+app.use('/static', express.static('public', { maxAge: 31557600 }));
 
 app.use('/app', appRoutes);
 app.use('/auth', authRoutes);

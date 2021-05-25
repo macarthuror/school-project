@@ -12,7 +12,9 @@ const consola = require('consola');
 const router = require('express').Router();
 
 router.use((req, res, next) => {
-  if (!req.session.loggedin) {
+  if (!req.session.loggedin || !req.session.user) {
+    req.session.user = null;
+    req.session.loggedin = null;
     res.redirect('/');
     res.end();
   } else {
@@ -28,14 +30,14 @@ router.get('/', function(req, res) {
  * PRODUCTOS
  ********************************/
 router.get('/productos', async function(req, res) {
-  const like = req.query.like;
+  const { like, deleted } = req.query;
   const conn = req.app.get('db');
   if (!like) {
-    const productos = await conn.query('SELECT * FROM products LIMIT 100');
+    const productos = await conn.query(`SELECT * FROM products ${deleted ? '' : 'WHERE status = 1'} LIMIT 100`);
     delete productos.meta;
     return res.render('pages/app/products', { productos });
   } else {
-    const productos = await conn.query(`SELECT * FROM products WHERE titulo LIKE '%${like}%' LIMIT 100`);
+    const productos = await conn.query(`SELECT * FROM products WHERE titulo LIKE '%${like}%' ${deleted ? '' : 'AND status = 1'} LIMIT 100`);
     delete productos.meta;
     return res.render('pages/app/products', { productos });
   }
@@ -61,6 +63,29 @@ router.post('/productos/nuevo', async function(req, res) {
       ('${titulo}', '${descripcion}', ${precio})
     `);
     return res.redirect('/app/productos')
+  } catch (error) {
+    consola.error(error);
+    req.flash("error", "Error al guardar el producto");
+    res.redirect('back')
+    return
+  }
+});
+
+router.delete('/productos/:id', async function(req, res) {
+  const { id } = req.params;
+  const { reactive } = req.query;
+
+  if (!id) {
+    req.flash("error", "No se han mandado todos los parametros necesarios");
+    return res.redirect('/app/productos')
+  }
+
+  const conn = req.app.get('db');
+  try {
+    await conn.query(`
+      UPDATE products SET status = ${reactive ? '1' : '0'} WHERE id=${id};
+    `);
+    return res.status(200).json('Eliminado con exito');
   } catch (error) {
     consola.error(error);
     req.flash("error", "Error al guardar el producto");
